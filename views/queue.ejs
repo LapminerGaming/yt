@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Queue</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const socket = io();
+      const queueContainer = document.getElementById('queue');
+
+      socket.on('queueUpdated', (queue) => {
+        queueContainer.innerHTML = '';
+        queue.forEach((url, index) => {
+          const div = document.createElement('div');
+          div.innerText = `${index + 1}. ${url}`;
+          queueContainer.appendChild(div);
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>Video Queue</h1>
+  <div id="queue"></div>
+</body>
+</html>
