@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Player</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const socket = io();
+      const videoFrame = document.getElementById('videoFrame');
+
+      function playVideo(url) {
+        videoFrame.src = `https://www.youtube.com/embed/${getYouTubeID(url)}?autoplay=1`;
+      }
+
+      function getYouTubeID(url) {
+        const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length == 11) ? match[2] : null;
+      }
+
+      socket.on('queueUpdated', (queue) => {
+        if (queue.length > 0) {
+          playVideo(queue[0]);
+        }
+      });
+
+      videoFrame.addEventListener('ended', () => {
+        socket.emit('videoPlayed');
+      });
+
+      // Check for the first time load
+      socket.emit('queueUpdated');
+    });
+  </script>
+</head>
+<body>
+  <h1>Now Playing</h1>
+  <iframe id="videoFrame" width="560" height="315" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</body>
+</html>
